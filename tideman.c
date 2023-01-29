@@ -100,7 +100,20 @@ int main(int argc, string argv[])
     return 0;
 }
 
+
 // Update ranks given a new vote
+
+// "The function takes arguments rank, name, and ranks.
+// If name is a match for the name of a valid candidate,
+// then you should update the ranks array to indicate that the voter has the candidate as their rank preference
+// (where 0 is the first preference, 1 is the second preference, etc.)"
+
+// "Recall that ranks[i] here represents the user’s ith preference."
+
+// "The function should return true if the rank was successfully recorded,
+// and false otherwise (if, for instance, name is not the name of one of the candidates)."
+
+// "You may assume that no two candidates will have the same name."
 bool vote(int rank, string name, int ranks[])
 {
     for (int i = 0; i < candidate_count; i++)
@@ -116,6 +129,15 @@ bool vote(int rank, string name, int ranks[])
 }
 
 // Update preferences given one voter's ranks
+
+/// "The function is called once for each voter,
+// and takes as argument the ranks array, (recall that ranks[i] is the voter’s ith preference,
+// where ranks[0] is the first preference)."
+
+// The function should update the global preferences array to add the current voter’s preferences.
+// Recall that preferences[i][j] should represent the number of voters who prefer candidate i over candidate j.
+
+// You may assume that every voter will rank each of the candidates.
 void record_preferences(int ranks[])
 {
     for (int i = 0; i < candidate_count; i++)
@@ -129,6 +151,12 @@ void record_preferences(int ranks[])
 }
 
 // Record pairs of candidates where one is preferred over the other
+
+// "The function should add all pairs of candidates where one candidate is preferred to the pairs array.
+// A pair of candidates who are tied (one is not preferred over the other) should not be added to the array."
+
+// "The function should update the global variable pair_count to be the number of pairs of candidates.
+// (The pairs should thus all be stored between pairs[0] and pairs[pair_count - 1], inclusive)."
 void add_pairs(void)
 {
     for (int i = 0; i < candidate_count; i++)
@@ -149,9 +177,12 @@ void add_pairs(void)
 }
 
 // Sort pairs in decreasing order by strength of victory
+
+// "The function should sort the pairs array in decreasing order of strength of victory,
+// where strength of victory is defined to be the number of voters who prefer the preferred candidate.
+// If multiple pairs have the same strength of victory, you may assume that the order does not matter."
 void sort_pairs(void)
 {
-    // TODO
     // pair sorted_pairs[pair_count];
     for (int i = 0; i < pair_count; i++)
     {
@@ -175,19 +206,19 @@ void sort_pairs(void)
     return;
 }
 
-
+// This is a function to support locked_pairs()
 bool is_loop(int current_pair, int original_winner, int locked_index[], int locked_count)
 {
     //for each locked pair
     for (int i = 0; i < locked_count; i++)
     {
-        //does this locked pair list my current loser as a winner
+        //does this locked pair list my original winner as a loser?
         if (pairs[locked_index[i]].loser == original_winner)
         {
             return true;
         }
 
-        //start a recursion, following the trail
+        //start a recursion, following the trail, until we have proven all trails will not cause loop)
         if (pairs[current_pair].loser == pairs[i].winner)
         {
             if (is_loop(locked_index[i], original_winner, locked_index, locked_count))
@@ -199,7 +230,9 @@ bool is_loop(int current_pair, int original_winner, int locked_index[], int lock
     return false;
 }
 
-// Lock pairs into the candidate graph in order, without creating cycles
+// Lock pairs into the candidate graph in order, without creating cycles (a cycle of locked in voting preferences)
+
+// "The function should create the locked graph, adding all edges in decreasing order of victory strength so long as the edge would not create a cycle."
 void lock_pairs(void)
 {
     int locked_index[pair_count];
@@ -221,26 +254,29 @@ void lock_pairs(void)
 }
 
 // Print the winner of the election
+
+// "The function should print out the name of the candidate who is the source of the graph. You may assume there will not be more than one source."
 void print_winner(void)
 {
     // figure out who is at the top of the tree
-
-    int winnerer = find_winners();
-    if (winnerer != -1)
+    int x = find_winners();
+    if (x != -1)
     {
-        printf("%s\n", candidates[winnerer]);
+        printf("%s\n", candidates[x]);
     }
     return;
 }
 
+// This is a function to support print_winner()
 int find_winners(void)
 {
-    int i;
-    for (i = 0; i < candidate_count; i++)
+    for (int i = 0; i < candidate_count; i++)
     {
         bool found = true;
         for (int j = 0; j < candidate_count; j++)
         {
+            // for each j, see if there are any locked winners over i
+            // if there are no locked winners over i, then i must be the ultimate winner, otherwise check the next i.
             if (locked[j][i])
             {
                 found = false;
@@ -252,5 +288,11 @@ int find_winners(void)
             return i;
         }
     }
+    // if no winners found, return -1
     return -1;
 }
+
+
+
+
+
