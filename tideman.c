@@ -34,7 +34,7 @@ void add_pairs(void);
 void sort_pairs(void);
 void lock_pairs(void);
 void print_winner(void);
-bool is_loop(int current_pair, int original_winner, int locked_index[], int locked_count);
+bool is_loop(int original_winner, int current_loser);
 int find_winners(void);
 
 int main(int argc, string argv[])
@@ -201,27 +201,25 @@ void sort_pairs(void)
         pairs[i] = pairs[x_index];
         pairs[x_index].winner = temp_winner;
         pairs[x_index].loser = temp_loser;
-        // printf("pairs winner %i with index %i\n", temp_winner, i);
+        // printf("pairs winner %i, loser %i with index %i\n", pairs[i].winner, pairs[i].loser, i);
     }
     return;
 }
 
 // This is a function to support locked_pairs()
-bool is_loop(int current_pair, int original_winner, int locked_index[], int locked_count)
+bool is_loop(int original_winner, int current_loser)
 {
-    //for each locked pair
-    for (int i = 0; i < locked_count; i++)
-    {
-        //does this locked pair list my original winner as a loser?
-        if (pairs[locked_index[i]].loser == original_winner)
+    if (locked[current_loser][original_winner])
         {
             return true;
         }
-
-        //start a recursion, following the trail, until we have proven all trails will not cause loop)
-        if (pairs[current_pair].loser == pairs[i].winner)
+    //for each locked pair
+    for (int i = 0; i < candidate_count; i++)
+    {
+        //does this locked pair list my original winner as a loser?
+        if (locked[current_loser][original_winner])
         {
-            if (is_loop(locked_index[i], original_winner, locked_index, locked_count))
+            if (is_loop(original_winner, i))
             {
                 return true;
             }
@@ -235,19 +233,24 @@ bool is_loop(int current_pair, int original_winner, int locked_index[], int lock
 // "The function should create the locked graph, adding all edges in decreasing order of victory strength so long as the edge would not create a cycle."
 void lock_pairs(void)
 {
-    int locked_index[pair_count];
+    //int locked_index[pair_count];
     int locked_count = 0;
 
     // for each pair[]
     for (int i = 0; i < pair_count; i++)
     {
+        int current_winner = pairs[i].winner;
+        int current_loser = pairs[i].loser;
         //if it will not cause a loop
-        if (!is_loop(i, pairs[i].winner, locked_index, locked_count))
+        if (!is_loop(current_winner, current_loser))
         {
             //lock this pair
             locked[pairs[i].winner][pairs[i].loser] = true;
-            locked_index[locked_count] = i;
+            printf("locked %i %i\n", pairs[i].winner, pairs[i].loser);
+            //locked_index[locked_count] = i;
+            //printf("locked index %i\n", i);
             locked_count++;
+            printf("locked_count %i\n", locked_count);
         }
     }
     return;
@@ -291,6 +294,7 @@ int find_winners(void)
     // if no winners found, return -1
     return -1;
 }
+
 
 
 
