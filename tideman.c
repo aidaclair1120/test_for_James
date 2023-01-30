@@ -209,15 +209,15 @@ void sort_pairs(void)
 // This is a function to support locked_pairs()
 bool is_loop(int original_winner, int current_loser)
 {
-    if (locked[current_loser][original_winner])
+    if (original_winner == current_loser)
         {
             return true;
         }
     //for each locked pair
     for (int i = 0; i < candidate_count; i++)
     {
-        //does this locked pair list my original winner as a loser?
-        if (locked[current_loser][original_winner])
+        //does this locked pair list my current loser as a winner
+        if (locked[current_loser][i])
         {
             if (is_loop(original_winner, i))
             {
@@ -239,18 +239,14 @@ void lock_pairs(void)
     // for each pair[]
     for (int i = 0; i < pair_count; i++)
     {
-        int current_winner = pairs[i].winner;
-        int current_loser = pairs[i].loser;
         //if it will not cause a loop
-        if (!is_loop(current_winner, current_loser))
+        if (!is_loop(pairs[i].winner, pairs[i].loser))
         {
             //lock this pair
             locked[pairs[i].winner][pairs[i].loser] = true;
-            printf("locked %i %i\n", pairs[i].winner, pairs[i].loser);
-            //locked_index[locked_count] = i;
-            //printf("locked index %i\n", i);
+            //printf("locked %i %i\n", pairs[i].winner, pairs[i].loser);
             locked_count++;
-            printf("locked_count %i\n", locked_count);
+            //printf("locked_count %i\n", locked_count);
         }
     }
     return;
